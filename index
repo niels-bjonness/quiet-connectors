@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiet connectors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<style>
+/* Layout: one reading column; a sticky switcher of five buttons (overview + four versions) swaps the article below. */
+:root{
+  --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2420; --muted:#5d6a63; --line:#dde3df;
+  --accent:#1f5c4a; --accent-soft:#e3eee9; --accent-fg:#ffffff; --warn:#8a5a12; --warn-soft:#f6ecd9;
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a201d; --fg:#e4ebe7; --muted:#9aa8a1; --line:#2c3531;
+  --accent:#7cc4a9; --accent-soft:#1f2e28; --accent-fg:#0e1512; --warn:#e2b56b; --warn-soft:#2c2416; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --fg:#e4ebe7; --muted:#9aa8a1; --line:#2c3531;
+  --accent:#7cc4a9; --accent-soft:#1f2e28; --accent-fg:#0e1512; --warn:#e2b56b; --warn-soft:#2c2416; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+header.top h1{font-family:var(--serif);font-weight:600;font-size:2.1rem;line-height:1.15;margin:0 0 8px;text-wrap:balance}
+header.top p{color:var(--muted);margin:0;max-width:62ch}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav.switch{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px;margin-top:20px;border-bottom:1px solid var(--line)}
+nav.switch .row{display:flex;flex-wrap:wrap;gap:8px}
+nav.switch button{font:500 .9rem/1.2 var(--sans);padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:flex;gap:8px;align-items:center}
+nav.switch button .n{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+nav.switch button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+nav.switch button[aria-pressed="true"] .n{color:var(--accent-fg)}
+nav.switch button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+article{padding-top:28px}
+article h1{font-family:var(--serif);font-weight:600;font-size:1.9rem;line-height:1.2;margin:0 0 6px;text-wrap:balance}
+.meta{color:var(--muted);font-size:.85rem;margin:0 0 22px;display:flex;flex-wrap:wrap;gap:6px 14px}
+.meta .tag{background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:4px;font-weight:500}
+article h2{font-family:var(--serif);font-weight:600;font-size:1.35rem;margin:34px 0 10px;text-wrap:balance}
+article p,article li{font-family:var(--serif);font-size:1.12rem;line-height:1.6;max-width:66ch}
+article p{margin:0 0 14px}
+article ul,article ol{padding-left:1.3em;margin:0 0 16px}
+article li{margin:0 0 8px}
+p.lead{font-size:1.25rem;font-weight:500}
+a{color:var(--accent);text-underline-offset:2px}
+.tbl{overflow-x:auto;margin:6px 0 20px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;line-height:1.45}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+.note{background:var(--warn-soft);color:var(--fg);border-left:3px solid var(--warn);padding:10px 14px;border-radius:4px;font-family:var(--sans)!important;font-size:.92rem!important}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:8px 0 24px}
+@media (max-width:620px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h3{font-family:var(--serif);font-size:1.15rem;margin:0;line-height:1.25}
+.card .lbl{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:4px 0 0}
+.card p{font-family:var(--sans);font-size:.92rem;line-height:1.45;margin:0}
+.card button{margin-top:auto;align-self:flex-start;font:500 .88rem var(--sans);padding:8px 14px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.card button:hover{background:var(--accent);color:var(--accent-fg)}
+.card.featured{border-color:var(--accent);background:var(--accent-soft);margin:8px 0 12px}
+.card button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sources li{font-family:var(--sans);font-size:.9rem}
+.diagram-note{font-family:var(--sans)!important;font-size:.9rem!important;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){article{animation:fade .25s ease}}
+@keyframes fade{from{opacity:.4}to{opacity:1}}
+.inline-go{font:500 .9rem var(--sans);padding:9px 16px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.inline-go:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Concept · Niels Bjønness · November 2026</p>
+    <h1>Quiet connectors</h1>
+    <p>An idea we are exploring: the people who quietly hold strong teams together. Concept highlights gives the short version. Quiet connectors is the full article.</p>
+  </header>
+
+  <nav class="switch" aria-label="Choose a view">
+    <div class="row">
+      <button type="button" data-view="highlights" id="btn-highlights">Concept highlights</button>
+      <button type="button" data-view="article" id="btn-article">Quiet connectors</button>
+    </div>
+  </nav>
+
+  <article id="highlights" data-panel>
+    <h1>Concept highlights</h1>
+    <p class="meta"><span>Updated 25 November 2026</span></p>
+
+    <h2>The concept in brief</h2>
+    <ul>
+      <li>Some people in a team make the others better. They notice what a colleague needs and help, without asking for credit. We call them quiet connectors.</li>
+      <li>They are hard to see for two reasons. Leaders often don't know who they are, and what they do happens between colleagues, not in reports or meetings.</li>
+      <li>Research from sport supports this. Sam Walker studied more than 1,200 teams in 37 sports and found that the most dominant had a particular kind of captain. His seven traits are listed below.</li>
+      <li>Research from companies supports it too. Using organizational network analysis (ONA), Rob Cross and colleagues found that 3 to 5% of employees provide 20 to 35% of the collaboration that adds value, and that leaders were surprised by at least half the names.</li>
+      <li>An organization can block this without knowing it, for example by reorganizing, by promoting or overloading the wrong people, or by putting quiet connectors in the spotlight.</li>
+      <li>We want to map who people turn to with ONA, and use AI to capture signals and keep the map current. Then we work over time with a sports psychologist and a PhD researcher to understand what these people actually do.</li>
+      <li>The goal is to help the organization keep making room for them. We don't aim to change the quiet connectors or take credit for what they do.</li>
+      <li>This is a long-term way of working built on research, not a fix with a promised return. It suits leaders who are curious about why their team performs.</li>
+    </ul>
+
+    <h2>Our working hypothesis</h2>
+    <p class="lead">We believe that identifying, capturing and nurturing the behaviour of quiet connectors sustains and increases a team's performance over time, because it builds a strong collaborative culture.</p>
+    <p>A team with that core has room for stars, and a star can take it from good to great. A team without it will not be saved by a star. A team with too many stars who don't work together will not work either.</p>
+
+    <p><strong>What we expect to see if the hypothesis holds:</strong></p>
+    <ul>
+      <li>The team performs well over several years, not just one good season.</li>
+      <li>Results change when a quiet connector joins or leaves.</li>
+      <li>Colleagues do better when that person is involved.</li>
+      <li>Help and advice run through a few people, often not the ones leaders would name.</li>
+      <li>Everyone in the team takes part, and a few voices don't take over.</li>
+      <li>When quiet connectors are overloaded, they leave and the team gets weaker.</li>
+    </ul>
+
+    <p><strong>What the research says so far:</strong></p>
+    <div class="tbl"><table>
+      <thead><tr><th>Source</th><th>Finding</th><th>What it suggests</th></tr></thead>
+      <tbody>
+        <tr><td>Sam Walker, <em>The Captain Class</em></td><td>The dominant runs began and ended with the captain. Bill Russell's Celtics had never won a title before he arrived, and the run ended the year before he retired. Walker says there was "a real clear cutoff" for every team he examined (<a href="https://www.apr.org/arts-life/2017-05-14/the-captain-class-defines-the-greatest-sports-teams-ever-based-on-one-character" target="_blank" rel="noopener">NPR interview</a>).</td><td>Performance over time follows the person. Walker chose his teams on results, so this is a pattern, not proof.</td></tr>
+        <tr><td>Michael Lewis, on Shane Battier</td><td>"When he is on the court, his teammates get better, often a lot better, and his opponents get worse" (<a href="https://deadspin.com/shane-come-back-the-no-stats-all-star-1505690302/" target="_blank" rel="noopener">Deadspin</a>).</td><td>The value shows in how others perform, not in the person's own numbers.</td></tr>
+        <tr><td>Swaab and colleagues, 2014</td><td>In football and basketball, adding top talent helped up to a point, then hurt, because players stopped coordinating. In baseball, where players depend less on each other, it did not hurt (<a href="https://www.psychologicalscience.org/news/releases/sports-teams-may-lose-out-from-having-too-much-talent.html" target="_blank" rel="noopener">APS</a>).</td><td>Too many stars without collaboration can lower performance. The statistical method behind the turning point has been questioned.</td></tr>
+        <tr><td>Woolley and colleagues, <em>Science</em>, 2010</td><td>A group's collective intelligence was not strongly linked to its members' average or top intelligence. It was linked to their social sensitivity and to how evenly they took turns talking (<a href="https://pubmed.ncbi.nlm.nih.gov/20929725/" target="_blank" rel="noopener">PubMed</a>).</td><td>How people work together matters more than who is smartest.</td></tr>
+        <tr><td>Alex Pentland, MIT</td><td>In a study of nearly 700 people, team success was only weakly linked to members' IQ. Teams where everyone was engaged and contributing were the most likely to succeed (<a href="https://ide.mit.edu/wp-content/uploads/2016/12/IDE-Research-Brief_v12-Sandy-Pentland.pdf?x41178" target="_blank" rel="noopener">MIT IDE</a>).</td><td>Communication patterns can be measured and predict results.</td></tr>
+        <tr><td>Rob Cross and colleagues</td><td>3 to 5% of employees provide 20 to 35% of value-added collaboration. Leaders were surprised by at least half the names, and heavy demand on these people predicted that they would leave (<a href="https://www.pathology.med.umich.edu/static/apps/cms/news/739/Collaboration_Grant.HBR2016.PDF" target="_blank" rel="noopener">HBR</a>).</td><td>The people who carry collaboration are few, often unseen, and at risk of burning out.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p><strong>What would show we are wrong:</strong> results that don't change when quiet connectors leave or are overloaded, or teams that do just as well with or without them. We will look for this as actively as for support.</p>
+
+    <h2>Walker's seven traits</h2>
+    <p>Walker found these traits in the captains of the most dominant teams in his study (<a href="https://www.weforum.org/stories/leadership/7-subtle-traits-of-successful-sports-captains-and-what-you-can-learn-from-them/" target="_blank" rel="noopener">WEF</a>). Each trait is in Walker's words, followed by a short explanation.</p>
+    <ol>
+      <li><strong>Extreme doggedness and focus in competition.</strong> They keep going, game after game.</li>
+      <li><strong>Aggressive play that tests the limits of the rules.</strong> They push hard for the team, close to what is allowed.</li>
+      <li><strong>A willingness to do thankless jobs in the shadows.</strong> They take the unglamorous work so others can shine.</li>
+      <li><strong>A low-key, practical and democratic way of communicating.</strong> They talk with teammates one to one more than they give speeches.</li>
+      <li><strong>Motivating others through passionate nonverbal displays.</strong> They lead through effort and body language.</li>
+      <li><strong>Strong convictions and the courage to stand apart.</strong> They will disagree, even with the coach, when they think it matters.</li>
+      <li><strong>Ironclad emotional control.</strong> They stay steady under pressure.</li>
+    </ol>
+    <p>Not all of these are quiet. Traits 2 and 6 describe people who push and disagree. "Quiet" describes how they work with their teammates, not their personality.</p>
+
+    <h2>How Moneyball actually worked</h2>
+    <ul>
+      <li><strong>The assistant was real, but the film changed him.</strong> Peter Brand in the film is fictional. He is based on Paul DePodesta, Billy Beane's assistant general manager, a Harvard graduate who had worked as a scout. DePodesta asked not to have his name used (<a href="https://www.nbcsports.com/mlb/news/paul-depodesta-explains-why-he-didnt-want-his-name-used-in-moneyball" target="_blank" rel="noopener">NBC Sports</a>).</li>
+      <li><strong>They started from the goal and worked backwards.</strong> The A's set about 95 wins as the target for making the playoffs. They estimated that this needed about 135 more runs scored than allowed over a season. Then they asked which statistics actually predict runs. On-base percentage mattered more than the market was paying for (<a href="https://www.ocw.mit.edu/courses/15-071-the-analytics-edge-spring-2017/9573ac589ee65559695bb7ef1962866b_MIT15_071S17_Unit2_Moneyball.pdf" target="_blank" rel="noopener">MIT course material</a>).</li>
+      <li><strong>The math was simple.</strong> An MIT course recreates it with linear regression on historical team data. The A's built their own metrics, but the core idea was to test common beliefs against results.</li>
+      <li><strong>They knew the limits.</strong> DePodesta: "The guiding principle of our work is figuring out a way to deal with uncertainty." They also looked at confidence and at how players handle teammates, coaches and adversity (<a href="https://nautil.us/revisiting-moneyball-with-paul-depodesta-236084" target="_blank" rel="noopener">Nautilus</a>).</li>
+    </ul>
+
+    <h2>How Moneyball relates to ONA</h2>
+    <ul>
+      <li><strong>The same idea.</strong> Both look past what is visible to find what actually drives results.</li>
+      <li><strong>A different object.</strong> Moneyball counted what individual players did in games. ONA maps relationships: who turns to whom. A quiet connector's value lies mostly in the relationships.</li>
+      <li><strong>The bridge is Shane Battier.</strong> In a later article, Lewis describes how the Houston Rockets valued Battier: "When he is on the court, his teammates get better, often a lot better, and his opponents get worse" (<a href="https://deadspin.com/shane-come-back-the-no-stats-all-star-1505690302/" target="_blank" rel="noopener">Deadspin</a>). That measures a person by the effect on others, which is close to what we want to do.</li>
+      <li><strong>How we can use it.</strong> Start from what the team needs to achieve and work back to what drives it. Look at how the team does when certain people are involved, alongside the ONA map of who people turn to. Neither shows what the person actually does. That takes people and time.</li>
+    </ul>
+
+    <h2>Open questions</h2>
+    <p class="lead">For peers: tell us where you disagree.</p>
+    <ul>
+      <li><strong>Who we are.</strong> Does the description of the team and why we are doing this convince you?</li>
+      <li><strong>What does the client get in the first three months?</strong> A map, a first account of what the quiet connectors do, something else?</li>
+      <li><strong>The name.</strong> "Quiet connector" has stuck. Does it work for you, or does "quiet" sound like a personality type?</li>
+      <li><strong>Our team.</strong> The PhD researcher, the sports psychologist and the engineer appear without names. Should they be named?</li>
+    </ul>
+    <p>Claims still to check before anything goes out:</p>
+    <ul>
+      <li>That Operators has used the Attacking Vikings concept, and how the alpine team shares course information (from Niels, no written source yet).</li>
+      <li>The critique of the too-much-talent study's method (seen in search results, not yet read).</li>
+    </ul>
+    <p><button type="button" class="inline-go" data-go="article">Read the full article</button></p>
+  </article>
+
+  <article id="article" data-panel hidden>
+    <h1>Quiet connectors</h1>
+    <p class="meta"><span>25 November 2026</span><span>Niels Bjønness</span></p>
+
+    <p class="lead">Many strong teams seem to have something that is hard to point to. Often it comes from a few people who see what a colleague needs and help, quietly and without asking for credit. We call them quiet connectors.</p>
+    <p>We are curious about what they do, why it works, and how an organization can make room for it. This article explains where the idea comes from, what research from sport and from companies says, and how we would like to work.</p>
+
+    <h2>A captain the team leaned on</h2>
+    <p>Carles Puyol captained FC Barcelona for ten years. His teammates chose him for the job at the start of the 2004-05 season, and that season ended with the league title. He was not the star. Xavi called him "the best professional I have ever shared a dressing room with, by far." Gerard Piqué said that by Puyol's side he felt protected. One teammate called him "a pain in the arse," and added: "that's exactly what we need." In 2011, weeks after Eric Abidal had a liver transplant, Puyol invited him to lift the Champions League trophy (<a href="https://global.espn.com/football/story/_/id/37399014/all-greatest-captain-carles-puyol-inspiring-leader" target="_blank" rel="noopener">ESPN</a>).</p>
+    <p>We think Puyol is a good example of a quiet connector. The team looked to the stars, but it leaned on him.</p>
+
+    <h2>What sport has found</h2>
+    <p><strong>The Captain Class.</strong> Sam Walker, a Wall Street Journal journalist, spent more than ten years studying over 1,200 teams in 37 sports (<a href="https://www.penguin.com.au/books/the-captain-class-9780670078493/extracts/1568-the-captain-class" target="_blank" rel="noopener">Penguin</a>). He picked out the 16 most dominant, among them the Boston Celtics, the New Zealand All Blacks and Barcelona in 2008-13 (<a href="https://www.penguin.co.nz/books/the-captain-class-9780670078493/article/1545-identifying-best" target="_blank" rel="noopener">Penguin</a>). What set them apart was not payroll, the coach or the biggest star. It was a particular kind of captain, often a defensive or support player and rarely the face of the team. Walker describes seven traits these captains share (<a href="https://www.weforum.org/stories/leadership/7-subtle-traits-of-successful-sports-captains-and-what-you-can-learn-from-them/" target="_blank" rel="noopener">WEF</a>):</p>
+    <ol>
+      <li>Extreme doggedness and focus in competition.</li>
+      <li>Aggressive play that tests the limits of the rules.</li>
+      <li>A willingness to do thankless jobs in the shadows.</li>
+      <li>A low-key, practical and democratic way of communicating.</li>
+      <li>Motivating others through passionate nonverbal displays.</li>
+      <li>Strong convictions and the courage to stand apart.</li>
+      <li>Ironclad emotional control.</li>
+    </ol>
+    <p>Not all of these traits are quiet. Some captains pushed hard and disagreed with their coach. "Quiet" describes how they work with their teammates, not their personality. Walker also says that the dominant runs began and ended with the captain. Bill Russell's Celtics had never won a title before he arrived, and their run ended the year before he retired (<a href="https://www.apr.org/arts-life/2017-05-14/the-captain-class-defines-the-greatest-sports-teams-ever-based-on-one-character" target="_blank" rel="noopener">NPR interview</a>). Walker chose his teams on their results, so this shows a pattern, not proof.</p>
+    <p><strong>Moneyball.</strong> Michael Lewis's book shows that value can sit in plain sight when nobody looks for it. In 2002 the Oakland A's had a payroll of $44 million, against the New York Yankees' more than $125 million (<a href="https://en.wikipedia.org/wiki/Moneyball:_The_Art_of_Winning_an_Unfair_Game" target="_blank" rel="noopener">Wikipedia</a>). General manager Billy Beane and his assistant Paul DePodesta could not outspend the richer teams. The assistant in the film, Peter Brand, is a fictional character based on DePodesta (<a href="https://www.nbcsports.com/mlb/news/paul-depodesta-explains-why-he-didnt-want-his-name-used-in-moneyball" target="_blank" rel="noopener">NBC Sports</a>).</p>
+    <p>They started from the goal. About 95 wins would take them to the playoffs, which they estimated needed about 135 more runs scored than allowed over a season. Then they asked which statistics actually predict runs. On-base percentage turned out to matter more than other teams were paying for. The math was simple, and an MIT course recreates it with linear regression (<a href="https://www.ocw.mit.edu/courses/15-071-the-analytics-edge-spring-2017/9573ac589ee65559695bb7ef1962866b_MIT15_071S17_Unit2_Moneyball.pdf" target="_blank" rel="noopener">MIT</a>). They also looked beyond the numbers, at players' confidence and at how they handled teammates and adversity. DePodesta: "The guiding principle of our work is figuring out a way to deal with uncertainty" (<a href="https://nautil.us/revisiting-moneyball-with-paul-depodesta-236084" target="_blank" rel="noopener">Nautilus</a>).</p>
+    <p>Moneyball measured what each player did. Later, Lewis wrote about the basketball player Shane Battier, whose value showed in others. "When he is on the court, his teammates get better, often a lot better, and his opponents get worse" (<a href="https://deadspin.com/shane-come-back-the-no-stats-all-star-1505690302/" target="_blank" rel="noopener">Deadspin</a>). That is closer to what quiet connectors do.</p>
+
+    <h2>The general manager decides who is on the team</h2>
+    <p>In Moneyball the central figure is the general manager, not the coach. The general manager recruits players, keeps them and lets them go. A quiet connector only stays on a team if that person sees the value, either by keeping them or by spotting them in another team and bringing them in.</p>
+    <p>Two things create the value together: who is on the team, and who carries the culture. The general manager decides the first. The quiet connector carries the second.</p>
+    <p>This does not translate directly to a company. The coach is closest to the visionary leader who speaks at the all-hands meeting. The general manager is the CEO or COO, depending on how they split responsibility, and usually whoever is in charge of the squad. That person also decides whether the team may be studied, and whether we are let in.</p>
+
+    <h2>What companies have found</h2>
+    <p>In companies, Rob Cross is one of the best-known researchers behind organizational network analysis (ONA), which maps who people actually turn to for advice and help. Across more than 300 organizations, he and his colleagues found that 3 to 5% of employees provide 20 to 35% of the collaboration that adds value. When the analysis named these people, leaders were "typically surprised by at least half the names on their lists." The colleagues most in demand also had the lowest engagement, and heavy demand on them predicted that they would leave (<a href="https://www.pathology.med.umich.edu/static/apps/cms/news/739/Collaboration_Grant.HBR2016.PDF" target="_blank" rel="noopener">HBR</a>).</p>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>Sport</th><th>Companies</th></tr></thead>
+      <tbody>
+        <tr><td>What gets overvalued</td><td>Flashy scorers and vocal stars</td><td>Charismatic presenters and titles</td></tr>
+        <tr><td>What gets overlooked</td><td>On-base percentage, support players</td><td>Who people go to for advice, who bridges teams</td></tr>
+        <tr><td>How it is found</td><td>Statistics and long study of teams</td><td>Peer surveys and collaboration data</td></tr>
+        <tr><td>The hidden role</td><td>The quiet captain</td><td>The central connector</td></tr>
+      </tbody>
+    </table></div>
+    <p>ONA collects data in two ways: short peer surveys, such as "Who do you go to when the path forward is unclear?", and data on who communicates with whom, without reading the content. It tends to show a few informal roles: central connectors inside a team, boundary spanners who link teams, and energizers who lift the people around them (<a href="https://positiveorgs.bus.umich.edu/articles/what-creates-energy-in-organizations/" target="_blank" rel="noopener">Cross, Baker and Parker</a>).</p>
+    <p>This kind of influence is granted by colleagues, not by the org chart. A study presented by researchers at the University of Missouri describes informal leadership as "continually granted" by peers. Informal leaders sit at the center of their group's advice network, and being asked for advice keeps them there (<a href="https://business.missouri.edu/sites/default/files/2026-02/THE_LEAD_F25_FINAL.pdf" target="_blank" rel="noopener">University of Missouri</a>). Our reading is that when a manager leaves, the org chart changes but the advice network stays.</p>
+    <p>Quiet carriers are not only found in sport and business. In <em>Who Is Government?</em>, Michael Lewis asked six writers to each profile someone doing important work for the US federal government. The publisher describes them as "universally reluctant to take credit" (<a href="https://www.penguin.co.nz/books/who-is-government-9780241778876" target="_blank" rel="noopener">Penguin</a>).</p>
+
+    <h2>Why collaboration may matter more than talent</h2>
+    <p>Chemistry is the part of a team that is easiest to overlook and easiest to call impossible to measure. Several studies suggest that it can be studied, and that it matters:</p>
+    <ul>
+      <li>In football and basketball, adding top talent helped up to a point and then hurt, because players stopped coordinating. In baseball, where players depend less on each other, it did not hurt. The statistical method behind the turning point has been questioned (<a href="https://www.psychologicalscience.org/news/releases/sports-teams-may-lose-out-from-having-too-much-talent.html" target="_blank" rel="noopener">Swaab and colleagues, 2014</a>).</li>
+      <li>A group's collective intelligence was not strongly linked to its members' average or top intelligence. It was linked to their social sensitivity and to how evenly they took turns talking (<a href="https://pubmed.ncbi.nlm.nih.gov/20929725/" target="_blank" rel="noopener">Woolley and colleagues, 2010</a>).</li>
+      <li>In a study of nearly 700 people, team success was only weakly linked to members' IQ. Teams where everyone was engaged and contributing were the most likely to succeed (<a href="https://ide.mit.edu/wp-content/uploads/2016/12/IDE-Research-Brief_v12-Sandy-Pentland.pdf?x41178" target="_blank" rel="noopener">Pentland, MIT</a>).</li>
+      <li>Gain Line Analytics, which works with sports teams, measures "the objective level of understanding between players" and argues that this shared understanding can matter more than talent alone (<a href="https://sloanreview.mit.edu/audio/talent-versus-teamwork" target="_blank" rel="noopener">MIT Sloan Management Review</a>).</li>
+    </ul>
+
+    <h2>Our working hypothesis</h2>
+    <p>We believe that identifying, capturing and nurturing the behaviour of quiet connectors sustains and increases a team's performance over time, because it builds a strong collaborative culture. A team with that core has room for stars, and a star can take it from good to great. A team without it will not be saved by a star, and a team with too many stars who don't work together will not work either.</p>
+    <p>If this holds, we expect to see teams that perform well over several years, results that change when a quiet connector joins or leaves, and colleagues who do better when that person is involved. We would be wrong if results don't change when quiet connectors leave or are overloaded. We will look for that as actively as for support.</p>
+
+    <h2>What we are curious about</h2>
+    <ul>
+      <li>What do quiet connectors actually do, day to day, that makes a difference?</li>
+      <li>Does a team that performs well know why? Could a reorg, a promotion or a heavier workload block something that works, without anyone noticing?</li>
+      <li>Would more attention help them, or take away what makes them work? We suspect the spotlight could hurt, but we don't know.</li>
+      <li>How can an organization be set up so it doesn't get in their way?</li>
+    </ul>
+
+    <h2>How we would work</h2>
+    <p>Walker spent ten years on his study, and Lewis followed the A's closely through a season. We want to work the same way: close to a few teams, over time. In Norway, we want to find one or more teams that already perform well and want to explore this with us.</p>
+    <ol>
+      <li><strong>Map.</strong> The groundwork is ONA. Open, opt-in peer surveys show who people turn to. AI captures signals from the tools the team already uses and keeps the picture current, so we don't need to interview the whole organization. A forward deployed engineer builds this into the team's own tools. We don't read private messages, and we don't infer emotions from voice, which the EU AI Act bans at work (<a href="https://legalblogs.wolterskluwer.com/global-workplace-law-and-policy/the-prohibition-of-ai-emotion-recognition-technologies-in-the-workplace-under-the-ai-act/" target="_blank" rel="noopener">Wolters Kluwer</a>).</li>
+      <li><strong>Understand.</strong> A map shows where to look, not what is going on, and run once it is easily misread. A sports psychologist who works with Norwegian teams and a PhD researcher who studies founder-led companies help us study what the quiet connectors actually do, in conversations and over time.</li>
+      <li><strong>Protect and strengthen.</strong> We look at what supports this behaviour and what blocks it: overload, structure, how people are promoted. Coaching can strengthen it where it helps. In one study, 20 leaders in an organization of 225 were coached, and the people closest to them in the network were more likely to see their wellbeing improve (<a href="https://ses.library.usyd.edu.au/handle/2123/9387" target="_blank" rel="noopener">O'Connor and Cavanagh, 2013</a>). In a small experiment, feedback from a person improved performance more than the same feedback from a computer (<a href="https://behavioristbookclub.com/aba-research/practitioner-development/continuous-performance-feedback--investigating-the-effects-of-feedback/" target="_blank" rel="noopener">Giamos and colleagues, 2024</a>).</li>
+    </ol>
+    <p>People come first, and AI is a tool. Many companies put AI to work and wait for results. A widely cited MIT report found that only about 5% of enterprise AI pilots produced rapid revenue growth. The report rests on interviews and surveys, so the number should be read loosely (<a href="https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/" target="_blank" rel="noopener">Fortune</a>). We turn it around: we start with the people who carry the team, and use AI to see them better.</p>
+    <p>We would start small, with one team, ideally one that is important or about to go through a big change.</p>
+
+    <h2>Learning from sport is not new</h2>
+    <p>Operators (formerly Venture Summits) brings C-suite leaders from venture companies together to share experiences, with roundtables built on peer learning (<a href="https://luma.com/szfqjyqa" target="_blank" rel="noopener">Luma</a>). They have used a concept from the Norwegian alpine ski team, the Attacking Vikings, where athletes share what they learn about the course with teammates still waiting to race. The skier Kjetil Jansrud has said: "There are no secrets in terms of individual tactics or techniques on the team; we share everything we know" (<a href="https://www.pulse.ng/entertainment-the-secret-of-norways-alpine-success-no-jerks-allowed/z41jcb2" target="_blank" rel="noopener">Pulse</a>). That is not the same as quiet connectors, but it shows that ideas from top sport can work in companies.</p>
+
+    <h2>Risks we take seriously</h2>
+    <ul>
+      <li><strong>Overload.</strong> The people others lean on are often the most stretched. Their capacity has to be protected and their work recognized.</li>
+      <li><strong>The spotlight.</strong> Pushing a quiet connector into a stage-facing role could cost the peer trust that made them effective. That is our reading of Walker, not a tested finding.</li>
+      <li><strong>Consent and trust.</strong> People need to know what is measured and agree to it, and trust what happens with it.</li>
+      <li><strong>Reading too much into the data.</strong> Walker's findings are qualitative and his teams were chosen on results. A network map shows connections, not why they exist. We don't claim to have the answers.</li>
+    </ul>
+
+    <h2>Who it is for</h2>
+    <p>Organizations that already perform, but maybe not at the level they want or could, and often at a point where the pressure is on. Leaders who are curious about why their team performs, and who share our belief that this is worth exploring. This is not a promise of a set return. It is a way of working, built on a belief that research backs.</p>
+
+    <h2>Who we are</h2>
+    <p>Four people who share the curiosity: a business strategist and builder (me), a forward deployed engineer, a sports psychologist and a PhD researcher on founder-led companies. I have helped build data infrastructure and tools for shared knowledge in early-stage venture companies. Each time, the real challenge was the people: how they use what is built, and who has the influence to understand what the team needs.</p>
+
+    <h2>What it takes</h2>
+    <p>Consent from the people involved, trust, a general manager who takes part, and at least six months. This is a long-term commitment, not a quick fix, and it is not for everyone. We want to find out, together with teams willing to look.</p>
+
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li><a href="https://global.espn.com/football/story/_/id/37399014/all-greatest-captain-carles-puyol-inspiring-leader" target="_blank" rel="noopener">ESPN, Carles Puyol, the inspiring captain</a></li>
+      <li><a href="https://www.penguin.com.au/books/the-captain-class-9780670078493/extracts/1568-the-captain-class" target="_blank" rel="noopener">Penguin, extract from The Captain Class</a></li>
+      <li><a href="https://www.penguin.co.nz/books/the-captain-class-9780670078493/article/1545-identifying-best" target="_blank" rel="noopener">Penguin, how Walker selected the 16 teams</a></li>
+      <li><a href="https://www.weforum.org/stories/leadership/7-subtle-traits-of-successful-sports-captains-and-what-you-can-learn-from-them/" target="_blank" rel="noopener">World Economic Forum, seven traits of elite captains</a></li>
+      <li><a href="https://www.apr.org/arts-life/2017-05-14/the-captain-class-defines-the-greatest-sports-teams-ever-based-on-one-character" target="_blank" rel="noopener">NPR, interview with Sam Walker</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Moneyball:_The_Art_of_Winning_an_Unfair_Game" target="_blank" rel="noopener">Wikipedia, Moneyball</a></li>
+      <li><a href="https://www.nbcsports.com/mlb/news/paul-depodesta-explains-why-he-didnt-want-his-name-used-in-moneyball" target="_blank" rel="noopener">NBC Sports, DePodesta on Moneyball</a></li>
+      <li><a href="https://www.ocw.mit.edu/courses/15-071-the-analytics-edge-spring-2017/9573ac589ee65559695bb7ef1962866b_MIT15_071S17_Unit2_Moneyball.pdf" target="_blank" rel="noopener">MIT OpenCourseWare, The Analytics Edge, Moneyball unit</a></li>
+      <li><a href="https://nautil.us/revisiting-moneyball-with-paul-depodesta-236084" target="_blank" rel="noopener">Nautilus, Revisiting Moneyball with Paul DePodesta</a></li>
+      <li><a href="https://deadspin.com/shane-come-back-the-no-stats-all-star-1505690302/" target="_blank" rel="noopener">Deadspin, The No-Stats All-Star</a></li>
+      <li><a href="https://www.pathology.med.umich.edu/static/apps/cms/news/739/Collaboration_Grant.HBR2016.PDF" target="_blank" rel="noopener">Cross, Rebele and Grant, Collaborative Overload, HBR 2016</a></li>
+      <li><a href="https://positiveorgs.bus.umich.edu/articles/what-creates-energy-in-organizations/" target="_blank" rel="noopener">Cross, Baker and Parker, What creates energy in organizations?, 2003</a></li>
+      <li><a href="https://business.missouri.edu/sites/default/files/2026-02/THE_LEAD_F25_FINAL.pdf" target="_blank" rel="noopener">University of Missouri, THE LEAD</a></li>
+      <li><a href="https://www.penguin.co.nz/books/who-is-government-9780241778876" target="_blank" rel="noopener">Penguin, Who Is Government?</a></li>
+      <li><a href="https://www.psychologicalscience.org/news/releases/sports-teams-may-lose-out-from-having-too-much-talent.html" target="_blank" rel="noopener">APS, the too-much-talent effect</a></li>
+      <li><a href="https://pubmed.ncbi.nlm.nih.gov/20929725/" target="_blank" rel="noopener">Woolley and colleagues, collective intelligence, Science 2010</a></li>
+      <li><a href="https://ide.mit.edu/wp-content/uploads/2016/12/IDE-Research-Brief_v12-Sandy-Pentland.pdf?x41178" target="_blank" rel="noopener">Pentland, MIT IDE research brief</a></li>
+      <li><a href="https://sloanreview.mit.edu/audio/talent-versus-teamwork" target="_blank" rel="noopener">MIT Sloan Management Review, talent versus teamwork</a></li>
+      <li><a href="https://legalblogs.wolterskluwer.com/global-workplace-law-and-policy/the-prohibition-of-ai-emotion-recognition-technologies-in-the-workplace-under-the-ai-act/" target="_blank" rel="noopener">Wolters Kluwer, emotion recognition at work under the AI Act</a></li>
+      <li><a href="https://ses.library.usyd.edu.au/handle/2123/9387" target="_blank" rel="noopener">O'Connor and Cavanagh, The coaching ripple effect, 2013</a></li>
+      <li><a href="https://behavioristbookclub.com/aba-research/practitioner-development/continuous-performance-feedback--investigating-the-effects-of-feedback/" target="_blank" rel="noopener">Giamos and colleagues, continuous performance feedback, 2024 (summary)</a></li>
+      <li><a href="https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/" target="_blank" rel="noopener">Fortune, MIT report on generative AI pilots</a></li>
+      <li><a href="https://luma.com/szfqjyqa" target="_blank" rel="noopener">Luma, Venture Summits event</a></li>
+      <li><a href="https://www.pulse.ng/entertainment-the-secret-of-norways-alpine-success-no-jerks-allowed/z41jcb2" target="_blank" rel="noopener">Pulse, the secret of Norway's alpine success</a></li>
+    </ul>
+  </article>
+
+</div>
+
+<script>
+(function(){
+  var views=["highlights","article"];
+  var panels=document.querySelectorAll("[data-panel]");
+  var buttons=document.querySelectorAll("nav.switch button");
+  function show(id,scroll){
+    if(views.indexOf(id)<0) id="highlights";
+    panels.forEach(function(p){p.hidden=(p.id!==id);});
+    buttons.forEach(function(b){b.setAttribute("aria-pressed",b.dataset.view===id?"true":"false");});
+    if(scroll){var nav=document.querySelector("nav.switch");window.scrollTo({top:Math.max(0,nav.offsetTop-4),behavior:"auto"});}
+  }
+  function go(id){
+    if(location.hash!=="#"+id){location.hash=id;} else {show(id,true);}
+  }
+  buttons.forEach(function(b){b.addEventListener("click",function(){go(b.dataset.view);});});
+  document.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){go(b.dataset.go);});});
+  window.addEventListener("hashchange",function(){show(location.hash.slice(1),true);});
+  show(location.hash.slice(1),false);
+})();
+</script>
+</body>
+</html>
